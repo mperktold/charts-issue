@@ -1,7 +1,42 @@
-# Custom project from Hilla
+# Reproducer for Issue with ChartOptions
 
-This project can be used as a starting point to create your own Hilla application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+This repository reproduces a Reference Error on the client side that happens when `ChartOptions` are changed after `Chart.redraw` has been called with `true`.
+The error looks like this:
+
+```
+vaadin.js?v=ca80360c:94687 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'redraw')
+    at vaadin.js?v=ca80360c:94687:126
+    at Array.forEach (<anonymous>)
+    at Chart.__callHighchartsFunction (vaadin.js?v=ca80360c:94687:109)
+    at HTMLBodyElement.eval (eval at Qt (FlowClient.js:1044:101), <anonymous>:3:63)
+    at Object.eval (eval at Qt (FlowClient.js:1044:101), <anonymous>:3:110)
+    at Qt (FlowClient.js:1044:166)
+    at Pt (FlowClient.js:995:277)
+    at Nt (FlowClient.js:614:57)
+    at rr (FlowClient.js:459:18)
+    at Nr.Or [as eb] (FlowClient.js:1053:19940)
+    at vB (FlowClient.js:964:221)
+    at ur (FlowClient.js:1048:296)
+    at Jr.Kr [as C] (FlowClient.js:1053:19706)
+    at Qk (FlowClient.js:441:29)
+    at mr (FlowClient.js:1051:1411)
+    at nr (FlowClient.js:1034:403)
+    at Ct.Et [as mb] (FlowClient.js:1053:23174)
+    at VB.WB [as J] (FlowClient.js:1053:36239)
+    at XMLHttpRequest.<anonymous> (FlowClient.js:631:63)
+    at Eb (FlowClient.js:450:29)
+    at Hb (FlowClient.js:920:56)
+    at XMLHttpRequest.<anonymous> (FlowClient.js:650:46)
+```
+
+To reproduce, follow the following steps:
+1. Start the application (see instructions below).
+2. Open the browser at http://localhost:8080.
+3. Open DevTools.
+4. In the Dashboard view, click on the update button.
+5. Navigate to "Other view".
+6. Navigate back to "Dashboard".
+7. You should now see the error in the console.
 
 ## Running the application
 
