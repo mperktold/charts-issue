@@ -1,10 +1,13 @@
-package com.example.application.views.dashboard2;
+package com.example.application.views.dashboard;
 
 
-import com.example.application.views.dashboard2.ServiceHealth.Status;
+import com.example.application.views.dashboard.ServiceHealth.Status;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.board.Board;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.Chart;
+import com.vaadin.flow.component.charts.ChartOptions;
 import com.vaadin.flow.component.charts.model.*;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -22,6 +25,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
@@ -29,13 +33,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
-@PageTitle("Dashboard2")
-@Menu(icon = "line-awesome/svg/chart-area-solid.svg", order = 1)
-@Route(value = "dashboard2")
-public class Dashboard2View extends Main {
+@PageTitle("Dashboard")
+@Menu(icon = "line-awesome/svg/chart-area-solid.svg", order = 0)
+@Route(value = "")
+@RouteAlias(value = "")
+public class DashboardView extends Main {
 
-    public Dashboard2View() {
-        addClassName("dashboard2-view");
+    public DashboardView() {
+        addClassName("dashboard1-view");
 
         Board board = new Board();
         board.addRow(createHighlight("Current users", "745", 33.7), createHighlight("View events", "54.6k", -112.45),
@@ -45,7 +50,16 @@ public class Dashboard2View extends Main {
         add(board);
     }
 
-    private Component createHighlight(String title, String value, Double percentage) {
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        var options = ChartOptions.get(attachEvent.getUI());
+        Lang lang = new Lang();
+        lang.setDecimalPoint(",");
+        options.setLang(lang);
+    }
+
+    private static Component createHighlight(String title, String value, Double percentage) {
         VaadinIcon icon = VaadinIcon.ARROW_UP;
         String prefix = "";
         String theme = "badge";
@@ -69,7 +83,7 @@ public class Dashboard2View extends Main {
         Icon i = icon.create();
         i.addClassNames(BoxSizing.BORDER, Padding.XSMALL);
 
-        Span badge = new Span(i, new Span(prefix + percentage.toString()));
+        Span badge = new Span(i, new Span(prefix + percentage));
         badge.getElement().getThemeList().add(theme);
 
         VerticalLayout layout = new VerticalLayout(h2, span, badge);
@@ -79,9 +93,9 @@ public class Dashboard2View extends Main {
         return layout;
     }
 
-    private Component createViewEvents() {
+    private static Component createViewEvents() {
         // Header
-        Select year = new Select();
+        Select<String> year = new Select<>();
         year.setItems("2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021");
         year.setValue("2021");
         year.setWidth("100px");
@@ -110,8 +124,10 @@ public class Dashboard2View extends Main {
         conf.addSeries(new ListSeries("New York", 65, 65, 166, 171, 293, 302, 308, 317, 427, 429, 535, 636));
         conf.addSeries(new ListSeries("Tokyo", 0, 11, 17, 123, 130, 142, 248, 349, 452, 454, 458, 462));
 
+        var updateButton = new Button("Update", e -> chart.drawChart(true));
+
         // Add it all together
-        VerticalLayout viewEvents = new VerticalLayout(header, chart);
+        VerticalLayout viewEvents = new VerticalLayout(header, chart, updateButton);
         viewEvents.addClassName(Padding.LARGE);
         viewEvents.setPadding(false);
         viewEvents.setSpacing(false);
@@ -119,12 +135,12 @@ public class Dashboard2View extends Main {
         return viewEvents;
     }
 
-    private Component createServiceHealth() {
+    private static Component createServiceHealth() {
         // Header
         HorizontalLayout header = createHeader("Service health", "Input / output");
 
         // Grid
-        Grid<ServiceHealth> grid = new Grid();
+        Grid<ServiceHealth> grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setAllRowsVisible(true);
 
@@ -154,7 +170,7 @@ public class Dashboard2View extends Main {
         return serviceHealth;
     }
 
-    private Component createResponseTimes() {
+    private static Component createResponseTimes() {
         HorizontalLayout header = createHeader("Response times", "Average across all systems");
 
         // Chart
@@ -181,7 +197,7 @@ public class Dashboard2View extends Main {
         return serviceHealth;
     }
 
-    private HorizontalLayout createHeader(String title, String subtitle) {
+    private static HorizontalLayout createHeader(String title, String subtitle) {
         H2 h2 = new H2(title);
         h2.addClassNames(FontSize.XLARGE, Margin.NONE);
 
@@ -199,7 +215,7 @@ public class Dashboard2View extends Main {
         return header;
     }
 
-    private String getStatusDisplayName(ServiceHealth serviceHealth) {
+    private static String getStatusDisplayName(ServiceHealth serviceHealth) {
         Status status = serviceHealth.getStatus();
         if (status == Status.OK) {
             return "Ok";
@@ -212,7 +228,7 @@ public class Dashboard2View extends Main {
         }
     }
 
-    private String getStatusTheme(ServiceHealth serviceHealth) {
+    private static String getStatusTheme(ServiceHealth serviceHealth) {
         Status status = serviceHealth.getStatus();
         String theme = "badge primary small";
         if (status == Status.EXCELLENT) {

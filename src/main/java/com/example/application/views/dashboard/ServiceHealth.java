@@ -1,4 +1,4 @@
-package com.example.application.views.dashboard2;
+package com.example.application.views.dashboard;
 
 /**
  * Simple DTO class for the inbox list to demonstrate complex object data
